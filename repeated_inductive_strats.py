@@ -28,21 +28,50 @@ def payoff(n_going, decision):
 # Choose strategy function
 def choose_strategy(strategy_id):
     strategies = {
-        1: strategy_2,
-        # 2: strategy_2,
-        # 3: strategy_1,
-        # 4: strategy_4,
+        # 1: strategy_2_01,
+        # 2: strategy_2_02,
+        # 3: strategy_2_03,
+        1: strategy_6_05,
+        2: strategy_6_10,
+        3: strategy_6_15,
     }
-    return strategies.get(strategy_id, strategy_1)  # Default to strategy_1 if not found
+    return strategies.get(strategy_id)  # Default to strategy_1 if not found
 
-# Pure Strategies
-def strategy_1(X=1, p=0.561):
-    if len(history) < X:
-        return p
-    avg_n_going = np.mean(history[-X:]) if len(history) >= X else 0
-    return 0 if avg_n_going > threshold_crowded else 1
+# # Pure Strategies
+# def strategy_1(X=1, p=0.561):
+#     if len(history) < X:
+#         return p
+#     avg_n_going = np.mean(history[-X:]) if len(history) >= X else 0
+#     return 0 if avg_n_going > threshold_crowded else 1
 
-def strategy_2(X=1,  p=0.561, factor=0.1):
+# def strategy_2_01(X=3,  p=0.548, factor=0.05):
+#     if len(history) < X:
+#         return p
+#     last_n_going = np.mean(history[-X:]) if len(history) >= X else 0
+#     difference = last_n_going - threshold_crowded
+#     adjustment = -difference * (1 / (n_agents - threshold_crowded))  * factor
+#     new_p = min(1, max(0, p + adjustment))
+#     return new_p
+
+# def strategy_2_02(X=3,  p=0.548, factor=0.1):
+#     if len(history) < X:
+#         return p
+#     last_n_going = np.mean(history[-X:]) if len(history) >= X else 0
+#     difference = last_n_going - threshold_crowded
+#     adjustment = -difference * (1 / (n_agents - threshold_crowded))  * factor
+#     new_p = min(1, max(0, p + adjustment))
+#     return new_p
+
+# def strategy_2_03(X=3,  p=0.548, factor=0.15):
+#     if len(history) < X:
+#         return p
+#     last_n_going = np.mean(history[-X:]) if len(history) >= X else 0
+#     difference = last_n_going - threshold_crowded
+#     adjustment = -difference * (1 / (n_agents - threshold_crowded))  * factor
+#     new_p = min(1, max(0, p + adjustment))
+#     return new_p
+
+# def strategy_2(X=3,  p=0.548, factor=0.1):
     if len(history) < X:
         return p
     last_n_going = np.mean(history[-X:]) if len(history) >= X else 0
@@ -51,23 +80,91 @@ def strategy_2(X=1,  p=0.561, factor=0.1):
     new_p = min(1, max(0, p + adjustment))
     return new_p
 
-def strategy_3(X=1,  p=0.561):
+
+# factorList = {
+#     1: 0.05,
+#     2: 0.1,
+#     3: 0.15
+# }
+
+factorList = {
+    1: 0.0,
+    2: 0.01,
+    3: 0.02
+}
+
+
+# # Adaptive Threshold Strategy
+# def strategy_6(X=3, p=0.548, threshold_adjust=0, factor=0.05):
+#     if len(history) < X:
+#         return p, threshold_adjust
+#     avg_n_going = np.mean(history[-X:])
+#     adaptive_threshold = threshold_crowded + factor * threshold_adjust * (avg_n_going - threshold_crowded)
+#     adjustment =  (adaptive_threshold - avg_n_going) / n_agents
+#     new_p = max(0, min(1, p + adjustment))
+#     new_threshold_adjust = threshold_adjust + (factor)
+#     return (new_p, new_threshold_adjust)
+
+def strategy_6_05(X=3, p=0.548, threshold_adjust=0, factor=factorList[1]):
     if len(history) < X:
-        return p
-    last_n_going = np.mean(history[-X:]) if len(history) >= X else 0
-    difference = threshold_crowded - last_n_going
+        return p, threshold_adjust
+    avg_n_going = np.mean(history[-X:])
+    threshold_adjust -=  factor  * (avg_n_going - threshold_crowded)
+    adjustment =  ((threshold_crowded+threshold_adjust) - avg_n_going) / n_agents
+    new_p = max(0, min(1, p + adjustment))
+    return (new_p, threshold_adjust)
 
-    # Ensure that the probability stays within [0, 1]
-    probability = max(0, min(1, (difference + threshold_crowded) / (2 * threshold_crowded)))
-    return probability
+def strategy_6_10(X=3, p=0.548, threshold_adjust=0, factor=factorList[2]):
+    if len(history) < X:
+        return p, threshold_adjust
+    avg_n_going = np.mean(history[-X:])
+    threshold_adjust -=  factor  * (avg_n_going - threshold_crowded)
+    adjustment =  ((threshold_crowded+threshold_adjust) - avg_n_going) / n_agents
+    new_p = max(0, min(1, p + adjustment))
+    return (new_p, threshold_adjust)
 
+def strategy_6_15(X=3, p=0.548, threshold_adjust=0, factor=factorList[3]):
+    if len(history) < X:
+        return p, threshold_adjust
+    avg_n_going = np.mean(history[-X:])
+    threshold_adjust -=  factor  * (avg_n_going - threshold_crowded)
+    adjustment =  ((threshold_crowded+threshold_adjust) - avg_n_going) / n_agents
+    new_p = max(0, min(1, p + adjustment))
+    return (new_p, threshold_adjust)
+
+
+# def strategy_6_05(X=3, p=0.548, threshold_adjust=0, factor=factorList[1]):
+#     if len(history) < X:
+#         return p, threshold_adjust
+#     avg_n_going = np.mean(history[-X:])
+#     threshold_adjust +=  factor  * (avg_n_going - threshold_crowded)
+#     adjustment =  ((threshold_crowded-threshold_adjust) - avg_n_going) / n_agents
+#     new_p = max(0, min(1, p + adjustment))
+#     return (new_p, threshold_adjust)
+
+# def strategy_6_10(X=3, p=0.548, threshold_adjust=0, factor=factorList[2]):
+#     if len(history) < X:
+#         return p, threshold_adjust
+#     avg_n_going = np.mean(history[-X:])
+#     threshold_adjust +=  factor  * (avg_n_going - threshold_crowded)
+#     adjustment =  ((threshold_crowded-threshold_adjust) - avg_n_going) / n_agents
+#     new_p = max(0, min(1, p + adjustment))
+#     return (new_p, threshold_adjust)
+
+# def strategy_6_15(X=3, p=0.548, threshold_adjust=0, factor=factorList[3]):
+#     if len(history) < X:
+#         return p, threshold_adjust
+#     avg_n_going = np.mean(history[-X:])
+#     threshold_adjust +=  factor  * (avg_n_going - threshold_crowded)
+#     adjustment =  ((threshold_crowded-threshold_adjust) - avg_n_going) / n_agents
+#     new_p = max(0, min(1, p + adjustment))
+#     return (new_p, threshold_adjust)
 
 # Simulation parameters
 days = 1000  # Number of times the simulation is run for testing
 n_agents = 101  # Total number of agents
 threshold_crowded = 50  # Threshold for the bar to be considered crowded
-n_strats = 1  # Number of strategies
-
+n_strats = 3  # Number of strategies
 
 history = []
 history_seperated = {i: [] for i in range(1, n_strats + 1)}
@@ -78,22 +175,18 @@ agents_per_strategy = n_agents // n_strats
 print(agents_per_strategy)
 
 
-
-
-
-
-
 for i in range(n_agents):
     strategy_id = (i // agents_per_strategy) % n_strats + 1  # Ensure strategy_id ranges between 1 and n_strats
     
     agent_profiles.append({
         'id': i,
         'strategy_id': strategy_id,
-        'strategy_factor': 0.1,  # Randomly choose a strategy probability between 0 and 1
+        # 'strategy_factor': 0.1,  # Randomly choose a strategy probability between 0 and 1
         # 'strategy_factor': np.random.rand(),  # Randomly choose a strategy probability between 0 and 1
-        'strategy_days': 5, 
-        # 'p': 0.561,  # Initial probability
-        'p':  np.random.rand(),  # Initial probability
+        'threshold_adjust': 0,
+        'strategy_days': 2, 
+        'p': 0.548,  # Initial probability
+        # 'p':  np.random.rand(),  # Initial probability
         'history': [],
         'cumulative_utility': 0,
         'utility_going': 0,
@@ -119,12 +212,10 @@ for day in range(days):
         # Determine decision based on strategy
         strategy_func = choose_strategy(agent['strategy_id'])
         if callable(strategy_func):  # Check if strategy function is callable
-            if (agent['strategy_id'] == 2):
-                agent['p'] = strategy_func(agent['strategy_days'], agent['p'], agent['strategy_factor'])
-            elif (agent['strategy_id'] == 3):
-                agent['p'] = strategy_func(agent['strategy_days'], agent['p'])
-            else: 
-                agent['p'] = strategy_func(agent['strategy_days'], agent['p']) 
+            # agent['p'] = strategy_func(agent['strategy_days'], agent['p']) #strat 2
+            # (agent['p'], agent['threshold_adjust']) = strategy_func(agent['strategy_days'], agent['p'], agent['threshold_adjust']) # strat 6
+            (agent['p'], agent['threshold_adjust']) = strategy_func(agent['strategy_days'], 0.548, agent['threshold_adjust']) # strat 6
+          
 
         decision = np.random.binomial(1, agent['p'])
         decisions.append(decision)
@@ -150,7 +241,9 @@ for day in range(days):
             'day': day,
             'decision': decision,
             'n_going': n_going,
-            'utility': agent_utility
+            'utility': agent_utility,
+            'p': agent['p'],
+            'threshold_adjust': agent['threshold_adjust']
         })
 
 # Calculate average utilities for agents going and staying
@@ -165,6 +258,7 @@ color_mapping = {
     3: 'orange'
 }
 shapes = ['o', 's']  # Circles for going, squares for staying
+
 
 # Plotting average utilities for agents going and staying
 plt.figure(figsize=(12, 6))
@@ -228,11 +322,49 @@ for agent in agent_profiles:
 
 for strategy_id, cumulative_utilities in cumulative_utilities_by_strategy.items():
     color = color_mapping[strategy_id]  # Get the color based on the strategy ID
-    plt.plot(range(1, days + 1), cumulative_utilities, label=f'Strategy {strategy_id}', color=color)
+    plt.plot(range(1, days + 1), cumulative_utilities, label=f'Strategy {factorList[strategy_id]}', color=color)
 
 plt.xlabel('Day')
 plt.ylabel('Cumulative Utility')
 plt.title('Cumulative Utility by Strategy Over Time')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Keep track of which strategies have already been plotted
+plotted_strategies = set()
+
+# Iterate over agent profiles
+for agent in agent_profiles:
+    strategy_id = agent['strategy_id']
+    color = color_mapping[strategy_id]  # Get color based on strategy ID
+    p_values = [history_point['p'] for history_point in agent['history']]
+    if strategy_id not in plotted_strategies:
+        plt.plot(range(1, len(p_values) + 1), p_values, label=f'Strategy {factorList[strategy_id]}', color=color)
+    # else:
+    #     plt.plot(range(1, len(p_values) + 1), p_values, color=color)
+    plotted_strategies.add(strategy_id)
+
+plt.xlabel('Day')
+plt.ylabel('p value')
+plt.title('Change in p values for each agent over time')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+plotted_strategies = set()
+
+for agent in agent_profiles:
+    strategy_id = agent['strategy_id']
+    color = color_mapping[strategy_id]  # Get color based on strategy ID
+    threshold_adjust_values = [history_point['threshold_adjust']+50 for history_point in agent['history']]  # Get threshold_adjust values
+    if strategy_id not in plotted_strategies:
+        plt.plot(range(1, len(threshold_adjust_values) + 1), threshold_adjust_values, label=f'Strategy {factorList[strategy_id]}', color=color)  # Plot threshold_adjust values with dashed line
+    plotted_strategies.add(strategy_id)
+
+plt.xlabel('Day')
+plt.ylabel('Adjusted Threshold')
+plt.title('Change in thresholds for each agent over time ')
 plt.legend()
 plt.grid(True)
 plt.show()

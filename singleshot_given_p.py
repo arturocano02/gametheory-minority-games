@@ -5,7 +5,8 @@ import numpy as np
 n_simulations = 1000  # Number of times the simulation is run
 n_agents = 101  # Total number of agents
 threshold_crowded = 50  # Threshold for the bar to be considered crowded
-p = 0.555  # Probability of each agent deciding to go to the bar
+p = 0.495  # Probability of each agent deciding to go to the bar
+# p = 0.548  # Probability of each agent deciding to go to the bar
 
 # Initialize counters
 times_crowded = 0

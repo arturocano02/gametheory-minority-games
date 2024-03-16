@@ -26,14 +26,21 @@ def payoff(n_going, decision):
 
 # Simulation parameters
 days = 200  # Number of times the simulation is run for testing
+# days = 1  # Number of times the simulation is run for testing
 n_agents = 101  # Total number of agents
 threshold_crowded = 50  # Threshold for the bar to be considered crowded
-
+n_going = 0  # Number of agents going to the bar
 history = []
 
 # Strategy probabilities
-strategy_p = [0.4]  # Adjusted to contain different strategies
-# strategy_p = [0.561]  # Adjusted to contain different strategies
+# strategy_p = [0.45]  # -8500
+# strategy_p = [0.5]  # -4000
+# strategy_p = [0.495]  # -4000
+# strategy_p = [0.53]  # -2700
+strategy_p = [0.548]  # -2650
+# strategy_p = [0.55]  # -2650
+# strategy_p = [0.56]  # -3000
+# strategy_p = [0.561]  # -3000
 # strategy_p = [0.25, 0.5, 0.75]  # Adjusted to contain different strategies
 # strategy_p = [0.96, 0.35, 0.75]  # Adjusted to contain different strategies
 
@@ -100,7 +107,8 @@ for i in range(len(strategy_p)):
 
 plt.xlabel('Agent ID')
 plt.ylabel('Average Utility')
-plt.title(f'Cumulative Utility of Agents over {days} Days. All with Strategy p={strategy_p[0]}')
+plt.title(f'Cumulative Utility of Agents over {days} Days. All with Strategy p={strategy_p[0]}.')
+# plt.title(f'Cumulative Utility of Agents over {days} Days. All with Strategy p={strategy_p[0]}. {n_going} Agents at bar. {n_agents-n_going} Agents not at bar')
 # plt.title(f'Average Utility of Agents over {days} Day. {n_going} Agents at bar')
 plt.legend()
 plt.grid(True)
@@ -143,5 +151,32 @@ plt.plot(range(1, days + 1), cumulative_utilities_by_day, color='orange', marker
 plt.xlabel('Day')
 plt.ylabel('Cumulative Utility')
 plt.title('Cumulative Utility of All Agents Over Time')
+plt.grid(True)
+plt.show()
+
+# Assuming the rest of your simulation has been run and agent_profiles is populated
+
+# Select 50 agents for display (here, just taking the first 50 for simplicity)
+selected_agents = agent_profiles[:20]
+
+# Calculate cumulative utilities for each selected agent over the 200 days
+cumulative_utilities_over_days = np.zeros((len(selected_agents), days))
+
+for i, agent in enumerate(selected_agents):
+    cumulative_utility = np.cumsum([day_info['utility'] for day_info in agent['history']])
+    cumulative_utilities_over_days[i] = cumulative_utility
+
+# Plotting
+plt.figure(figsize=(14, 8))
+
+# Creating a colormap
+colors = plt.cm.jet(np.linspace(0, 1, len(selected_agents)))
+
+for i, cumulative_utilities in enumerate(cumulative_utilities_over_days):
+    plt.plot(range(1, days + 1), cumulative_utilities, color=colors[i], linewidth=1)
+
+plt.xlabel('Day')
+plt.ylabel('Cumulative Utility')
+plt.title('Cumulative Utility Over 200 Days for 50 Agents')
 plt.grid(True)
 plt.show()
